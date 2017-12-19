@@ -225,6 +225,7 @@
 #include <htd/RandomVertexSelectionStrategy.hpp>
 #include <htd/SemiNormalizationOperation.hpp>
 #include <htd/SeparatorBasedTreeDecompositionAlgorithm.hpp>
+#include <htd/SeparatorBasedTreeDecompositionAlgorithm2.hpp>
 #include <htd/SetCoverAlgorithmFactory.hpp>
 #include <htd/SetCoverAlgorithm.hpp>
 #include <htd/SingleNeighborVertexSelectionStrategy.hpp>
@@ -247,5 +248,6 @@
 #include <htd/WeakNormalizationOperation.hpp>
 #include <htd/WidthMinimizingTreeDecompositionAlgorithm.hpp>
 #include <htd/WidthReductionOperation.hpp>
+#include <htd/WidthReductionOperation2.hpp>
 
 #endif /* HTD_HTD_MAIN_HPP */

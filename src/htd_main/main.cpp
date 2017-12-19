@@ -626,7 +626,7 @@ int main(int argc, const char * const * const argv)
 
         if (std::string(strategyChoice.value()) == "min-separator")
         {
-            htd::SeparatorBasedTreeDecompositionAlgorithm * treeDecompositionAlgorithm = new htd::SeparatorBasedTreeDecompositionAlgorithm(libraryInstance);
+            htd::SeparatorBasedTreeDecompositionAlgorithm2 * treeDecompositionAlgorithm = new htd::SeparatorBasedTreeDecompositionAlgorithm2(libraryInstance);
 
             treeDecompositionAlgorithm->setComputeInducedEdgesEnabled(false);
 
