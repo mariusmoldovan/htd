@@ -44,23 +44,34 @@ namespace htd
              *  Constructor for a new ordering algorithm of type ExtrernalOrderingAlgorithm.
              *
              *  @param[in] manager   The management instance to which the new algorithm belongs.
+             *
+             *  @param[in] ordering  The ordering which is to be passed on.
+             */
+            HTD_API ExternalOrderingAlgorithm(const htd::LibraryInstance * const manager, htd::IVertexOrdering *ordering);
+
+            /**
+             *  Constructor for a new ordering algorithm of type ExtrernalOrderingAlgorithm.
+             *
+             *  @param[in] manager   The management instance to which the new algorithm belongs.
              */
             HTD_API ExternalOrderingAlgorithm(const htd::LibraryInstance * const manager);
 
             HTD_API virtual ~ExternalOrderingAlgorithm();
 
-            HTD_API void writeOrderingTo(const htd::IMultiHypergraph & graph, std::vector<htd::vertex_t> & target) const HTD_NOEXCEPT HTD_OVERRIDE;
+            HTD_API htd::IVertexOrdering * computeOrdering(const htd::IMultiHypergraph & graph) const HTD_NOEXCEPT HTD_OVERRIDE;
+
+            HTD_API htd::IVertexOrdering * computeOrdering(const htd::IMultiHypergraph & graph, const htd::IPreprocessedGraph & preprocessedGraph) const HTD_NOEXCEPT HTD_OVERRIDE;
 
             HTD_API const htd::LibraryInstance * managementInstance(void) const HTD_NOEXCEPT HTD_OVERRIDE;
 
             HTD_API void setManagementInstance(const htd::LibraryInstance * const manager) HTD_OVERRIDE;
 
-            HTD_API ExternalOrderingAlgorithm * clone(void) const HTD_OVERRIDE;
-
 #ifndef HTD_USE_VISUAL_STUDIO_COMPATIBILITY_MODE
-
+            HTD_API ExternalOrderingAlgorithm * clone(void) const HTD_OVERRIDE;
 #else
+            HTD_API ExternalOrderingAlgorithm * clone(void) const;
 
+            HTD_API htd::IOrderingAlgorithm * cloneOrderingAlgorithm(void) const HTD_OVERRIDE;
 #endif
 
         protected:

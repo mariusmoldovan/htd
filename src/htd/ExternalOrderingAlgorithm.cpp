@@ -27,7 +27,7 @@
 
 #include <htd/Globals.hpp>
 #include <htd/Helpers.hpp>
-#include <htd/MinDegreeOrderingAlgorithm.hpp>
+#include <htd/ExternalOrderingAlgorithm.hpp>
 #include <htd/GraphPreprocessorFactory.hpp>
 #include <htd/IGraphPreprocessor.hpp>
 #include <htd/VertexOrdering.hpp>
@@ -37,7 +37,7 @@
 #include <unordered_set>
 
 /**
- *  Private implementation details of class htd::MinDegreeOrderingAlgorithm.
+ *  Private implementation details of class htd::ExternalOrderingAlgorithm.
  */
 struct htd::ExternalOrderingAlgorithm::Implementation
 {
@@ -62,6 +62,11 @@ struct htd::ExternalOrderingAlgorithm::Implementation
     const htd::LibraryInstance * managementInstance_;
 
     /**
+     *  Instance of the ordering.
+     */
+    htd::IVertexOrdering *ordering_;
+
+    /**
      *  Compute the vertex ordering of a given graph and write it to the end of a given vector.
      *
      *  @param[in] preprocessedGraph    The input graph in preprocessed format.
@@ -70,8 +75,26 @@ struct htd::ExternalOrderingAlgorithm::Implementation
      *
      *  @return The maximum bag size of the decomposition which is obtained via bucket elimination using the input graph and the resulting ordering.
      */
-    std::size_t writeOrderingTo(const htd::IPreprocessedGraph & preprocessedGraph, std::vector<htd::vertex_t> & target, std::size_t maxBagSize) const HTD_NOEXCEPT;
+    std::size_t writeOrderingTo(const htd::IPreprocessedGraph & preprocessedGraph, std::vector<htd::vertex_t> & target, std::size_t maxBagSize) const HTD_NOEXCEPT;\
+
+    /**
+     *  Return ordering as it is received via constructor.
+     *
+     *  @param[in] graph                The input graph.
+     *
+     *  @return The ordering which is received via constructor.
+     */
+    htd::IVertexOrdering * computeOrdering(const htd::IMultiHypergraph & graph)
+    {
+        return ordering_;
+    }
+
 };
+
+htd::ExternalOrderingAlgorithm::ExternalOrderingAlgorithm(const htd::LibraryInstance * const manager, htd::IVertexOrdering *ordering) : implementation_(new Implementation(manager))
+{
+    implementation_->ordering_ = ordering;
+}
 
 htd::ExternalOrderingAlgorithm::ExternalOrderingAlgorithm(const htd::LibraryInstance * const manager) : implementation_(new Implementation(manager))
 {
@@ -83,9 +106,14 @@ htd::ExternalOrderingAlgorithm::~ExternalOrderingAlgorithm()
 
 }
 
-htd::IVertexOrdering * htd::ExternalOrderingAlgorithm::computeOrdering(const htd::IMultiHypergraph & graph, htd::IVertexOrdering ordering) const HTD_NOEXCEPT
+htd::IVertexOrdering * htd::ExternalOrderingAlgorithm::computeOrdering(const htd::IMultiHypergraph & graph) const HTD_NOEXCEPT
 {
-    return ordering;
+    return implementation_->computeOrdering(graph);
+}
+
+htd::IVertexOrdering * htd::ExternalOrderingAlgorithm::computeOrdering(const htd::IMultiHypergraph & graph, const htd::IPreprocessedGraph & preprocessedGraph) const HTD_NOEXCEPT
+{
+    return implementation_->computeOrdering(graph);
 }
 
 const htd::LibraryInstance * htd::ExternalOrderingAlgorithm::managementInstance(void) const HTD_NOEXCEPT
