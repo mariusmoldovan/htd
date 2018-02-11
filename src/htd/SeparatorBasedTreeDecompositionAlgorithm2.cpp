@@ -58,7 +58,7 @@ struct htd::SeparatorBasedTreeDecompositionAlgorithm2::Implementation
      *
      *  @param[in] manager  The management instance to which the current object instance belongs.
      */
-    Implementation(const htd::LibraryInstance * const manager) : managementInstance_(manager), separatorAlgorithm_(manager->graphSeparatorAlgorithmFactory().createInstance()), labelingFunctions_(), postProcessingOperations_(), computeInducedEdges_(true)
+    Implementation(const htd::LibraryInstance * const manager, long maxWidth) : managementInstance_(manager), maxWidth_(maxWidth), separatorAlgorithm_(manager->graphSeparatorAlgorithmFactory().createInstance()), labelingFunctions_(), postProcessingOperations_(), computeInducedEdges_(true)
     {
 
     }
@@ -68,7 +68,7 @@ struct htd::SeparatorBasedTreeDecompositionAlgorithm2::Implementation
      *
      *  @param[in] original The original implementation details structure.
      */
-    Implementation(const Implementation & original) : managementInstance_(original.managementInstance_), separatorAlgorithm_(original.separatorAlgorithm_->clone()), labelingFunctions_(), postProcessingOperations_(), computeInducedEdges_(original.computeInducedEdges_)
+    Implementation(const Implementation & original) : managementInstance_(original.managementInstance_), maxWidth_(original.maxWidth_), separatorAlgorithm_(original.separatorAlgorithm_->clone()), labelingFunctions_(), postProcessingOperations_(), computeInducedEdges_(original.computeInducedEdges_)
     {
         for (htd::ILabelingFunction * labelingFunction : original.labelingFunctions_)
         {
@@ -110,6 +110,11 @@ struct htd::SeparatorBasedTreeDecompositionAlgorithm2::Implementation
     const htd::LibraryInstance * managementInstance_;
 
     /**
+     *  Maximum bag width fow which a separator should be seeked.
+     */
+    long maxWidth_;
+
+    /**
      *  The underlying graph separator algorithm.
      */
     htd::IGraphSeparatorAlgorithm * separatorAlgorithm_;
@@ -140,12 +145,12 @@ struct htd::SeparatorBasedTreeDecompositionAlgorithm2::Implementation
     htd::IMutableTreeDecomposition * computeMutableDecomposition(const htd::IMultiHypergraph & graph, const htd::IPreprocessedGraph & preprocessedGraph) const;
 };
 
-htd::SeparatorBasedTreeDecompositionAlgorithm2::SeparatorBasedTreeDecompositionAlgorithm2(const htd::LibraryInstance * const manager) : implementation_(new Implementation(manager))
+htd::SeparatorBasedTreeDecompositionAlgorithm2::SeparatorBasedTreeDecompositionAlgorithm2(const htd::LibraryInstance * const manager, long maxWidth) : implementation_(new Implementation(manager, maxWidth))
 {
 
 }
 
-htd::SeparatorBasedTreeDecompositionAlgorithm2::SeparatorBasedTreeDecompositionAlgorithm2(const htd::LibraryInstance * const manager, const std::vector<htd::IDecompositionManipulationOperation *> & manipulationOperations)  : implementation_(new Implementation(manager))
+htd::SeparatorBasedTreeDecompositionAlgorithm2::SeparatorBasedTreeDecompositionAlgorithm2(const htd::LibraryInstance * const manager, const std::vector<htd::IDecompositionManipulationOperation *> & manipulationOperations, long maxWidth)  : implementation_(new Implementation(manager, maxWidth))
 {
     setManipulationOperations(manipulationOperations);
 }
@@ -400,7 +405,7 @@ htd::IMutableTreeDecomposition * htd::SeparatorBasedTreeDecompositionAlgorithm2:
     {
         HTD_ASSERT(ret != nullptr)
 
-        WidthReductionOperation2 operation(managementInstance_);
+        WidthReductionOperation2 operation(managementInstance_, maxWidth_);
 
         operation.setGraphSeparatorAlgorithm(separatorAlgorithm_->clone());
 

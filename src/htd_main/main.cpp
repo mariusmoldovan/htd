@@ -102,7 +102,11 @@ htd_cli::OptionManager * createOptionManager(void)
         strategyChoice->setDefaultValue("min-fill");
 
         manager->registerOption(strategyChoice, "Algorithm Options");
+        //
+        htd_cli::SingleValueOption * maxWidthOption = new htd_cli::SingleValueOption("max-width", "Set the maximum bag width for which not to look for a separator.", "max-width");
 
+        manager->registerOption(maxWidthOption, "Min-Separator Strategy Options");
+//
         htd_cli::Choice * preprocessingChoice = new htd_cli::Choice("preprocessing", "Set the preprocessing strategy which shall be used to <strategy>.", "strategy");
 
         preprocessingChoice->addPossibility("none", "Do not preprocess the input graph.");
@@ -173,6 +177,8 @@ bool handleOptions(int argc, const char * const * const argv, htd_cli::OptionMan
     const htd_cli::Choice & strategyChoice = optionManager.accessChoice("strategy");
 
     const htd_cli::SingleValueOption & seedOption = optionManager.accessSingleValueOption("seed");
+
+    const htd_cli::SingleValueOption & maxWidthOption = optionManager.accessSingleValueOption("max-width");
 
     const htd_cli::SingleValueOption & instanceOption = optionManager.accessSingleValueOption("instance");
 
@@ -360,6 +366,28 @@ bool handleOptions(int argc, const char * const * const argv, htd_cli::OptionMan
             else
             {
                 std::cerr << "INVALID PROGRAM CALL: Option --iterations may only be used when option --opt is set to \"width\"!" << std::endl;
+
+                ret = false;
+            }
+        }
+    }
+
+    if(ret && (maxWidthOption.used() && (!strategyChoice.used() || (strategyChoice.used() && strcmp(strategyChoice.value(), "min-separator") != 0))))
+    {
+        std::cerr << "INVALID PROGRAM CALL: Option --max-width may only be used when option --strategy is set to \"min-separator\"!" << std::endl;
+
+        ret = false;
+    }
+
+    if (ret)
+    {
+        if (maxWidthOption.used())
+        {
+            long value = std::stol(maxWidthOption.value(),nullptr);
+
+            if (value < 1)
+            {
+                std::cerr << "INVALID MAX-WIDTH: " << maxWidthOption.value() << std::endl;
 
                 ret = false;
             }
@@ -618,6 +646,8 @@ int main(int argc, const char * const * const argv)
 
         const htd_cli::SingleValueOption & patienceOption = optionManager->accessSingleValueOption("patience");
 
+        const htd_cli::SingleValueOption & maxWidthOption = optionManager->accessSingleValueOption("max-width");
+
         const htd_cli::Option & printProgressOption = optionManager->accessOption("print-progress");
 
         const std::string & outputFormat = outputFormatChoice.value();
@@ -626,7 +656,7 @@ int main(int argc, const char * const * const argv)
 
         if (std::string(strategyChoice.value()) == "min-separator")
         {
-            htd::SeparatorBasedTreeDecompositionAlgorithm2 * treeDecompositionAlgorithm = new htd::SeparatorBasedTreeDecompositionAlgorithm2(libraryInstance);
+            htd::SeparatorBasedTreeDecompositionAlgorithm2 * treeDecompositionAlgorithm = new htd::SeparatorBasedTreeDecompositionAlgorithm2(libraryInstance, std::stol(maxWidthOption.value(), nullptr));
 
             treeDecompositionAlgorithm->setComputeInducedEdgesEnabled(false);
 

@@ -44,7 +44,7 @@ namespace htd
              *
              *  @param[in] manager  The management instance to which the new manipulation operation belongs.
              */
-            HTD_API WidthReductionOperation2(const htd::LibraryInstance * const manager);
+            HTD_API WidthReductionOperation2(const htd::LibraryInstance * const manager, long maxWidth);
 
             HTD_API virtual ~WidthReductionOperation2();
 
