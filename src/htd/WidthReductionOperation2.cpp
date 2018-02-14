@@ -46,7 +46,7 @@ struct htd::WidthReductionOperation2::Implementation
      *
      *  @param[in] manager   The management instance to which the current object instance belongs.
      */
-    Implementation(const htd::LibraryInstance * const manager, long maxWidth) : managementInstance_(manager), maxWidth_(maxWidth),
+    Implementation(const htd::LibraryInstance * const manager, std::size_t maxWidth, std::size_t sepIter) : managementInstance_(manager), maxWidth_(maxWidth), sepIter_(sepIter),
                                                                  separatorAlgorithm_(managementInstance_->graphSeparatorAlgorithmFactory().createInstance()),
                                                                  connectedComponentAlgorithm_(managementInstance_->connectedComponentAlgorithmFactory().createInstance()), restrictedToLargestBags_(true)
     {
@@ -75,9 +75,14 @@ struct htd::WidthReductionOperation2::Implementation
     const htd::LibraryInstance * managementInstance_;
 
     /**
-     *  Maximum bag width fow which a separator should be seeked.
+     *  Maximum bag width for which not to look for a separator.
      */
-    long maxWidth_;
+    std::size_t maxWidth_;
+
+    /**
+     *  Maximum number of iterations.
+     */
+    std::size_t sepIter_;
 
     /**
      *  The algorithm for computing separating vertex sets.
@@ -309,7 +314,7 @@ struct htd::WidthReductionOperation2::Implementation
     InducedGraph * createCorrespondingGraph(const htd::IMultiHypergraph & graph, const htd::ITreeDecomposition & decomposition, htd::vertex_t vertex) const;
 };
 
-htd::WidthReductionOperation2::WidthReductionOperation2(const htd::LibraryInstance * const manager, long maxWidth) : implementation_(new Implementation(manager, maxWidth))
+htd::WidthReductionOperation2::WidthReductionOperation2(const htd::LibraryInstance * const manager, std::size_t maxWidth, std::size_t sepIter) : implementation_(new Implementation(manager, maxWidth, sepIter))
 {
 
 }
@@ -346,9 +351,9 @@ void htd::WidthReductionOperation2::apply(const htd::IMultiHypergraph & graph, h
 
     std::unordered_set<htd::vertex_t> updatedRelevantVertices(relevantVertices.begin(), relevantVertices.end());
 
-    int currentIteration = 1;
+    std::size_t currentIteration = 1;
 
-    while (ok)// && currentIteration <= implementation_->maxWidth_)
+    while (ok && currentIteration <= implementation_->sepIter_)
     {
         ok = false;
 
@@ -475,7 +480,7 @@ void htd::WidthReductionOperation2::setRestrictedToLargestBags(bool restrictedTo
 
 htd::WidthReductionOperation2 * htd::WidthReductionOperation2::clone(void) const
 {
-    return new htd::WidthReductionOperation2(implementation_->managementInstance_, implementation_->maxWidth_);
+    return new htd::WidthReductionOperation2(implementation_->managementInstance_, implementation_->maxWidth_, implementation_->sepIter_);
 }
 
 void htd::WidthReductionOperation2::setGraphSeparatorAlgorithm(htd::IGraphSeparatorAlgorithm * algorithm)
