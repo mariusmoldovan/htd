@@ -80,6 +80,7 @@ htd_cli::OptionManager * createOptionManager(void)
         outputFormatChoice->addPossibility("td", "Use the output format 'td'.");
         outputFormatChoice->addPossibility("human", "Provide a human-readable output of the decomposition.");
         outputFormatChoice->addPossibility("width", "Provide only the maximum bag size of the decomposition.");
+        outputFormatChoice->addPossibility("graphML", "Use the output format 'graphML'.");
 
         outputFormatChoice->setDefaultValue("td");
 
@@ -806,6 +807,10 @@ int main(int argc, const char * const * const argv)
             else if (outputFormat == "width")
             {
                 exporter = new htd_io::WidthExporter();
+            }
+            else if (outputFormat == "graphML")
+            {
+                exporter = new htd_io::GraphMLFormatExporter();
             }
             else
             {
